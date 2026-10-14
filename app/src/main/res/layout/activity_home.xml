@@ -14,44 +14,36 @@
         android:textStyle="bold"
         android:layout_marginBottom="20dp"/>
 
-    <!-- Scrollable area for when you have many trips -->
+    <!-- Everything inside here scrolls together -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginBottom="20dp">
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/tripListContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
+            <!-- The auto-generated trip buttons go here -->
+            <LinearLayout
+                android:id="@+id/tripListContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            </LinearLayout>
+
+            <!-- The Create button sits neatly under the last trip -->
+            <Button
+                android:id="@+id/newTripButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="+ Create New Trip"
+                android:backgroundTint="#1976D2"
+                android:textColor="#FFFFFF"
+                android:padding="15dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="30dp"/>
+
         </LinearLayout>
     </ScrollView>
-
-    <!-- Inline Create Trip Form (No Popup) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/newTripNameInput"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="New trip name..."
-            android:background="#FFFFFF"
-            android:padding="15dp"
-            android:elevation="2dp"/>
-
-        <Button
-            android:id="@+id/inlineCreateButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Create"
-            android:backgroundTint="#1976D2"
-            android:layout_marginStart="10dp"/>
-    </LinearLayout>
-
 </LinearLayout>
