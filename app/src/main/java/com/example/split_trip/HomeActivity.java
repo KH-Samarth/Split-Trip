@@ -1,28 +1,29 @@
-
 package com.example.split_trip;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ScrollView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.split_trip.database.TripRepository;
+import com.example.split_trip.models.Trip;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
-    private SharedPreferences prefs;
+    private TripRepository tripRepository;
     private LinearLayout tripListContainer;
 
     private ScrollView homeScreen;
@@ -34,7 +35,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        prefs = getSharedPreferences("SplitTripData", MODE_PRIVATE);
+        tripRepository = new TripRepository(this);
 
         tripListContainer = findViewById(R.id.tripListContainer);
 
@@ -55,10 +56,12 @@ public class HomeActivity extends AppCompatActivity {
             if (id == R.id.nav_home) {
                 showScreen(homeScreen);
                 return true;
+
             } else if (id == R.id.nav_trips) {
                 showScreen(tripsScreen);
                 refreshTripList();
                 return true;
+
             } else if (id == R.id.nav_profile) {
                 showScreen(profileScreen);
                 return true;
@@ -71,6 +74,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void showScreen(View selectedScreen) {
+
         homeScreen.setVisibility(View.GONE);
         tripsScreen.setVisibility(View.GONE);
         profileScreen.setVisibility(View.GONE);
@@ -105,24 +109,20 @@ public class HomeActivity extends AppCompatActivity {
                         return;
                     }
 
-                    String currentTrips =
-                            prefs.getString("TRIPS_LIST", "");
+                    Trip newTrip = new Trip(
+                            newTripName,
+                            System.currentTimeMillis(),
+                            0L
+                    );
 
-                    if (currentTrips.isEmpty()) {
-                        currentTrips = newTripName;
-                    } else {
-                        currentTrips += "," + newTripName;
-                    }
+                    tripRepository.insertTrip(newTrip, tripId -> {
 
-                    prefs.edit()
-                            .putString("TRIPS_LIST", currentTrips)
-                            .apply();
+                        Toast.makeText(this,
+                                "Trip Created!",
+                                Toast.LENGTH_SHORT).show();
 
-                    refreshTripList();
-
-                    Toast.makeText(this,
-                            "Trip Created!",
-                            Toast.LENGTH_SHORT).show();
+                        refreshTripList();
+                    });
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
@@ -130,47 +130,39 @@ public class HomeActivity extends AppCompatActivity {
 
     private void refreshTripList() {
 
-        tripListContainer.removeAllViews();
+        tripRepository.getAllTrips(trips -> {
 
-        String savedTrips = prefs.getString("TRIPS_LIST", "");
+            tripListContainer.removeAllViews();
 
-        if (savedTrips.isEmpty()) {
-            return;
-        }
+            LayoutInflater inflater =
+                    LayoutInflater.from(this);
 
-        ArrayList<String> myTripsList =
-                new ArrayList<>(Arrays.asList(savedTrips.split(",")));
+            for (Trip trip : trips) {
 
-        for (String tripName : myTripsList) {
+                View tripCard = inflater.inflate(
+                        R.layout.item_trip,
+                        tripListContainer,
+                        false
+                );
 
-            if (tripName.trim().isEmpty()) {
-                continue;
+                TextView tripNameText =
+                        tripCard.findViewById(R.id.tripNameText);
+
+                tripNameText.setText(trip.getName());
+
+                tripCard.setOnClickListener(v -> {
+
+                    Intent intent =
+                            new Intent(HomeActivity.this, MainActivity.class);
+
+                    intent.putExtra("TRIP_ID", trip.getId());
+                    intent.putExtra("TRIP_TITLE", trip.getName());
+
+                    startActivity(intent);
+                });
+
+                tripListContainer.addView(tripCard);
             }
-
-            Button dynamicButton = new Button(this);
-            dynamicButton.setText(tripName);
-            dynamicButton.setAllCaps(false);
-            dynamicButton.setTextSize(16);
-
-            LinearLayout.LayoutParams params =
-                    new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                    );
-
-            params.setMargins(0, 0, 0, 12);
-            dynamicButton.setLayoutParams(params);
-
-            dynamicButton.setOnClickListener(v -> {
-
-                Intent intent =
-                        new Intent(HomeActivity.this, MainActivity.class);
-
-                intent.putExtra("TRIP_TITLE", tripName);
-                startActivity(intent);
-            });
-
-            tripListContainer.addView(dynamicButton);
-        }
+        });
     }
 }

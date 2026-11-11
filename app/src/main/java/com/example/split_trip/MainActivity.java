@@ -1,109 +1,216 @@
 package com.example.split_trip;
 
-import android.content.SharedPreferences;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.split_trip.database.ExpenseRepository;
+import com.example.split_trip.database.TripRepository;
+import com.example.split_trip.models.Trip;
+import com.example.split_trip.models.Expense;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private double totalSpent = 0.0;
-    private StringBuilder expenseLog = new StringBuilder();
-    private SharedPreferences prefs;
+    private int tripId;
+    private String tripTitle;
+
+    private ExpenseRepository expenseRepository;
+    private TripRepository tripRepository;
+
+    private TextView totalSpentText;
+    private TextView expenseLogText;
+
+    private EditText payerInput;
+    private EditText amountInput;
+    private EditText descInput;
+    private Button addExpenseButton;
+
+    private long totalSpentPaise = 0L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TextView tripTitleText = findViewById(R.id.tripTitleText);
-        Button backButton = findViewById(R.id.backButton);
-        TextView totalSpentText = findViewById(R.id.totalSpentText);
-        TextView expenseLogText = findViewById(R.id.expenseLogText);
+        tripId = getIntent().getIntExtra("TRIP_ID", -1);
+        tripTitle = getIntent().getStringExtra("TRIP_TITLE");
 
-        String tripTitle = getIntent().getStringExtra("TRIP_TITLE");
-        if (tripTitle != null) {
-            tripTitleText.setText(tripTitle);
+        if (tripId == -1 || tripTitle == null) {
+            Toast.makeText(this,
+                    "Unable to open trip",
+                    Toast.LENGTH_SHORT).show();
+            finish();
+            return;
         }
 
-        // --- 1. LOAD SAVED DATA ---
-        // Open the phone's local storage
-        prefs = getSharedPreferences("SplitTripData", MODE_PRIVATE);
+        expenseRepository = new ExpenseRepository(this);
+        tripRepository = new TripRepository(this);
 
-        // Load the math and log using the trip's name as the key
-        totalSpent = prefs.getFloat(tripTitle + "_total", 0.0f);
-        String savedLog = prefs.getString(tripTitle + "_log", "");
-        expenseLog = new StringBuilder(savedLog);
+        TextView tripTitleText = findViewById(R.id.tripTitleText);
+        Button backButton = findViewById(R.id.backButton);
 
-        // Display the loaded data
-        totalSpentText.setText("Total Trip Cost: ₹" + totalSpent);
-        expenseLogText.setText(expenseLog.toString());
+        totalSpentText = findViewById(R.id.totalSpentText);
+        expenseLogText = findViewById(R.id.expenseLogText);
+
+        payerInput = findViewById(R.id.payerInput);
+        amountInput = findViewById(R.id.amountInput);
+        descInput = findViewById(R.id.descInput);
+
+        addExpenseButton = findViewById(R.id.addExpenseButton);
+        Button deleteTripButton = findViewById(R.id.deleteTripButton);
+
+        tripTitleText.setText(tripTitle);
 
         backButton.setOnClickListener(v -> finish());
 
-        // --- 2. LOG & SAVE NEW EXPENSES ---
-        EditText payerInput = findViewById(R.id.payerInput);
-        EditText amountInput = findViewById(R.id.amountInput);
-        EditText descInput = findViewById(R.id.descInput);
-        Button addExpenseButton = findViewById(R.id.addExpenseButton);
+        addExpenseButton.setOnClickListener(v -> addExpense());
 
-        addExpenseButton.setOnClickListener(v -> {
-            String payer = payerInput.getText().toString();
-            String amountStr = amountInput.getText().toString();
-            String desc = descInput.getText().toString();
+        deleteTripButton.setOnClickListener(v -> confirmDeleteTrip());
 
-            if (payer.isEmpty() || amountStr.isEmpty() || desc.isEmpty()) {
-                Toast.makeText(MainActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+        refreshExpenses();
+    }
+
+    private void addExpense() {
+
+        String payer = payerInput.getText().toString().trim();
+        String amountStr = amountInput.getText().toString().trim();
+        String desc = descInput.getText().toString().trim();
+
+        if (payer.isEmpty() || amountStr.isEmpty() || desc.isEmpty()) {
+            Toast.makeText(this,
+                    "Please fill all fields",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        long amountPaise;
+
+        try {
+            BigDecimal amount = new BigDecimal(amountStr);
+
+            amountPaise = amount
+                    .movePointRight(2)
+                    .longValueExact();
+
+            if (amountPaise <= 0) {
+                Toast.makeText(this,
+                        "Enter an amount greater than zero",
+                        Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            double amount = Double.parseDouble(amountStr);
-            totalSpent += amount;
+        } catch (NumberFormatException | ArithmeticException e) {
+            Toast.makeText(this,
+                    "Enter a valid amount (maximum 2 decimal places)",
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            totalSpentText.setText("Total Trip Cost: ₹" + totalSpent);
-            expenseLog.insert(0, payer + " paid ₹" + amount + " for " + desc + "\n\n");
-            expenseLogText.setText(expenseLog.toString());
+        Expense expense = new Expense(
+                tripId,
+                payer,
+                amountPaise,
+                desc,
+                System.currentTimeMillis()
+        );
 
-            // Save instantly to phone storage
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putFloat(tripTitle + "_total", (float) totalSpent);
-            editor.putString(tripTitle + "_log", expenseLog.toString());
-            editor.apply(); // Applies the save in the background
+        addExpenseButton.setEnabled(false);
+
+        expenseRepository.insertExpense(expense, expenseId -> {
+
+            addExpenseButton.setEnabled(true);
 
             payerInput.setText("");
             amountInput.setText("");
             descInput.setText("");
+
+            refreshExpenses();
+
+            Toast.makeText(this,
+                    "Expense added!",
+                    Toast.LENGTH_SHORT).show();
         });
-        Button deleteTripButton = findViewById(R.id.deleteTripButton);
-        // --- 3. BULLETPROOF DELETE TRIP LOGIC ---
-        deleteTripButton.setOnClickListener(v -> {
-            // 1. Delete this trip's expenses
-            prefs.edit().remove(tripTitle + "_total").remove(tripTitle + "_log").apply();
+    }
 
-            // 2. Get the master list
-            String savedTrips = prefs.getString("TRIPS_LIST", "");
-            String[] tripsArray = savedTrips.split(",");
+    private void refreshExpenses() {
 
-            // 3. Rebuild the list, completely ignoring the one we want to delete
-            StringBuilder updatedList = new StringBuilder();
-            for (String trip : tripsArray) {
-                // Trim removes hidden spaces. If it doesn't match the title, keep it.
-                if (!trip.trim().isEmpty() && !trip.trim().equals(tripTitle.trim())) {
-                    if (updatedList.length() > 0) {
-                        updatedList.append(",");
-                    }
-                    updatedList.append(trip.trim());
-                }
+        expenseRepository.getExpensesForTrip(tripId, expenses -> {
+
+            expenseLogText.setText("");
+
+            if (expenses.isEmpty()) {
+                expenseLogText.setText("No expenses recorded yet.");
+                return;
             }
 
-            // 4. Save the newly rebuilt list back to storage
-            prefs.edit().putString("TRIPS_LIST", updatedList.toString()).apply();
+            StringBuilder log = new StringBuilder();
 
-            Toast.makeText(MainActivity.this, "Trip Deleted!", Toast.LENGTH_SHORT).show();
-            finish(); // Close screen
+            for (Expense expense : expenses) {
+
+                String amount = BigDecimal.valueOf(
+                        expense.getAmountPaise(), 2
+                ).toPlainString();
+
+                log.append(expense.getPayer())
+                        .append(" paid ₹")
+                        .append(amount)
+                        .append(" for ")
+                        .append(expense.getDescription())
+                        .append("\n\n");
+            }
+
+            expenseLogText.setText(log.toString());
         });
+
+        expenseRepository.getTotalExpensesForTrip(tripId, total -> {
+
+            totalSpentPaise = total;
+
+            String formattedTotal = BigDecimal.valueOf(
+                    totalSpentPaise, 2
+            ).toPlainString();
+
+            totalSpentText.setText(
+                    "Total Trip Cost: ₹" + formattedTotal
+            );
+        });
+    }
+
+    private void confirmDeleteTrip() {
+
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Trip?")
+                .setMessage("Are you sure you want to delete \""
+                        + tripTitle
+                        + "\"? All its expenses will also be deleted.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Delete", (dialog, which) -> {
+
+                    Trip trip = new Trip(
+                            tripTitle,
+                            System.currentTimeMillis(),
+                            0L
+                    );
+
+                    trip.setId(tripId);
+
+                    tripRepository.deleteTrip(trip, () -> {
+
+                        Toast.makeText(this,
+                                "Trip deleted",
+                                Toast.LENGTH_SHORT).show();
+
+                        finish();
+                    });
+                })
+                .show();
     }
 }
