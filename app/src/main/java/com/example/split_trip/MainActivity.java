@@ -16,6 +16,12 @@ import com.example.split_trip.database.ExpenseRepository;
 import com.example.split_trip.database.TripRepository;
 import com.example.split_trip.models.Trip;
 import com.example.split_trip.models.Expense;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.view.LayoutInflater;
+
+import com.example.split_trip.database.TripMemberRepository;
+import com.example.split_trip.models.TripMember;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
 
     private ExpenseRepository expenseRepository;
     private TripRepository tripRepository;
+    private TripMemberRepository tripMemberRepository;
+    private LinearLayout memberListContainer;
+    private TextView memberEmptyText;
+    private Button addMemberButton;
 
     private TextView totalSpentText;
     private LinearLayout expenseListContainer;
@@ -57,6 +67,15 @@ public class MainActivity extends AppCompatActivity {
 
         expenseRepository = new ExpenseRepository(this);
         tripRepository = new TripRepository(this);
+        tripMemberRepository = new TripMemberRepository(this);
+
+        memberListContainer = findViewById(R.id.memberListContainer);
+        memberEmptyText = findViewById(R.id.memberEmptyText);
+        addMemberButton = findViewById(R.id.addMemberButton);
+
+        addMemberButton.setOnClickListener(v -> showAddMemberDialog());
+
+        refreshMembers();
 
         TextView tripTitleText = findViewById(R.id.tripTitleText);
         Button backButton = findViewById(R.id.backButton);
@@ -336,4 +355,110 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .show();
     }
+
+    private void showAddMemberDialog() {
+        EditText nameInput = new EditText(this);
+        nameInput.setHint("Member name");
+        nameInput.setSingleLine(true);
+
+        EditText emailInput = new EditText(this);
+        emailInput.setHint("Email (optional)");
+        emailInput.setInputType(
+                android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        );
+        emailInput.setSingleLine(true);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(48, 16, 48, 0);
+        layout.addView(nameInput);
+        layout.addView(emailInput);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Add Trip Member")
+                .setView(layout)
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Add", (dialog, which) -> {
+                    String name = nameInput.getText().toString().trim();
+                    String email = emailInput.getText().toString().trim();
+
+                    if (name.isEmpty()) {
+                        Toast.makeText(this,
+                                "Please enter a name",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    TripMember member = new TripMember(
+                            tripId, name, email, false
+                    );
+
+                    tripMemberRepository.insertMember(member, () -> {
+                        refreshMembers();
+                        Toast.makeText(this,
+                                "Member added",
+                                Toast.LENGTH_SHORT).show();
+                    });
+                })
+                .show();
+    }
+
+    private void refreshMembers() {
+        tripMemberRepository.getMembersForTrip(tripId, members -> {
+            memberListContainer.removeAllViews();
+
+            if (members.isEmpty()) {
+                memberEmptyText.setVisibility(View.VISIBLE);
+                memberListContainer.addView(memberEmptyText);
+                return;
+            }
+
+            memberEmptyText.setVisibility(View.GONE);
+
+            LayoutInflater inflater = LayoutInflater.from(this);
+
+            for (TripMember member : members) {
+                View memberRow = inflater.inflate(
+                        R.layout.item_member,
+                        memberListContainer,
+                        false
+                );
+
+                TextView initialText =
+                        memberRow.findViewById(R.id.memberInitialText);
+
+                TextView nameText =
+                        memberRow.findViewById(R.id.memberNameText);
+
+                TextView roleText =
+                        memberRow.findViewById(R.id.memberRoleText);
+
+                Button removeButton =
+                        memberRow.findViewById(R.id.removeMemberButton);
+
+                nameText.setText(member.getName());
+
+                String initial = member.getName().substring(0, 1).toUpperCase();
+                initialText.setText(initial);
+
+                roleText.setText(
+                        member.isCreator() ? "Trip Creator" : "Trip Member"
+                );
+
+                removeButton.setOnClickListener(v ->
+                        new AlertDialog.Builder(this)
+                                .setTitle("Remove Member")
+                                .setMessage("Remove " + member.getName() + " from this trip?")
+                                .setNegativeButton("Cancel", null)
+                                .setPositiveButton("Remove", (dialog, which) ->
+                                        tripMemberRepository.deleteMember(member, this::refreshMembers)
+                                )
+                                .show()
+                );
+
+                memberListContainer.addView(memberRow);
+            }
+        });
+    }
+
 }

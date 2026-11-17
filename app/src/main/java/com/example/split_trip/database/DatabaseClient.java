@@ -20,10 +20,12 @@ public class DatabaseClient {
                 if (instance == null) {
 
                     instance = Room.databaseBuilder(
-                            context.getApplicationContext(),
-                            AppDatabase.class,
-                            "split_trip_database"
-                    ).build();
+                                    context.getApplicationContext(),
+                                    AppDatabase.class,
+                                    "split_trip_database"
+                            )
+                            .addMigrations(AppDatabase.MIGRATION_1_2)
+                            .build();
 
                 }
             }
