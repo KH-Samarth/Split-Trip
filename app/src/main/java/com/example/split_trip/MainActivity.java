@@ -6,6 +6,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -26,7 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private TripRepository tripRepository;
 
     private TextView totalSpentText;
-    private TextView expenseLogText;
+    private LinearLayout expenseListContainer;
+    private TextView expenseEmptyText;
 
     private EditText payerInput;
     private EditText amountInput;
@@ -58,7 +62,8 @@ public class MainActivity extends AppCompatActivity {
         Button backButton = findViewById(R.id.backButton);
 
         totalSpentText = findViewById(R.id.totalSpentText);
-        expenseLogText = findViewById(R.id.expenseLogText);
+        expenseListContainer = findViewById(R.id.expenseListContainer);
+        expenseEmptyText = findViewById(R.id.expenseEmptyText);
 
         payerInput = findViewById(R.id.payerInput);
         amountInput = findViewById(R.id.amountInput);
@@ -144,30 +149,51 @@ public class MainActivity extends AppCompatActivity {
 
         expenseRepository.getExpensesForTrip(tripId, expenses -> {
 
-            expenseLogText.setText("");
+            expenseListContainer.removeAllViews();
 
             if (expenses.isEmpty()) {
-                expenseLogText.setText("No expenses recorded yet.");
-                return;
+                expenseEmptyText.setVisibility(View.VISIBLE);
+            } else {
+                expenseEmptyText.setVisibility(View.GONE);
+
+                LayoutInflater inflater = LayoutInflater.from(this);
+
+                for (Expense expense : expenses) {
+
+                    View expenseCard = inflater.inflate(
+                            R.layout.item_expense,
+                            expenseListContainer,
+                            false
+                    );
+
+                    TextView descriptionText =
+                            expenseCard.findViewById(R.id.expenseDescriptionText);
+
+                    TextView payerText =
+                            expenseCard.findViewById(R.id.expensePayerText);
+
+                    TextView amountText =
+                            expenseCard.findViewById(R.id.expenseAmountText);
+
+                    descriptionText.setText(expense.getDescription());
+                    payerText.setText("Paid by " + expense.getPayer());
+
+                    String amount = BigDecimal.valueOf(
+                            expense.getAmountPaise(), 2
+                    ).toPlainString();
+
+                    amountText.setText("₹" + amount);
+
+                    Button editButton = expenseCard.findViewById(R.id.editExpenseButton);
+                    Button deleteButton = expenseCard.findViewById(R.id.deleteExpenseButton);
+
+                    editButton.setOnClickListener(v -> showEditExpenseDialog(expense));
+
+                    deleteButton.setOnClickListener(v -> confirmDeleteExpense(expense));
+
+                    expenseListContainer.addView(expenseCard);
+                }
             }
-
-            StringBuilder log = new StringBuilder();
-
-            for (Expense expense : expenses) {
-
-                String amount = BigDecimal.valueOf(
-                        expense.getAmountPaise(), 2
-                ).toPlainString();
-
-                log.append(expense.getPayer())
-                        .append(" paid ₹")
-                        .append(amount)
-                        .append(" for ")
-                        .append(expense.getDescription())
-                        .append("\n\n");
-            }
-
-            expenseLogText.setText(log.toString());
         });
 
         expenseRepository.getTotalExpensesForTrip(tripId, total -> {
@@ -178,10 +204,107 @@ public class MainActivity extends AppCompatActivity {
                     totalSpentPaise, 2
             ).toPlainString();
 
-            totalSpentText.setText(
-                    "Total Trip Cost: ₹" + formattedTotal
-            );
+            totalSpentText.setText("Total Trip Cost: ₹" + formattedTotal);
         });
+    }
+
+    private void showEditExpenseDialog(Expense expense) {
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(48, 16, 48, 0);
+
+        EditText payerField = new EditText(this);
+        payerField.setHint("Paid by");
+        payerField.setText(expense.getPayer());
+
+        EditText amountField = new EditText(this);
+        amountField.setHint("Amount");
+        amountField.setInputType(
+                android.text.InputType.TYPE_CLASS_NUMBER
+                        | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
+        );
+        amountField.setText(
+                BigDecimal.valueOf(expense.getAmountPaise(), 2).toPlainString()
+        );
+
+        EditText descriptionField = new EditText(this);
+        descriptionField.setHint("Description");
+        descriptionField.setText(expense.getDescription());
+
+        layout.addView(payerField);
+        layout.addView(amountField);
+        layout.addView(descriptionField);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Edit Expense")
+                .setView(layout)
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Save", (dialog, which) -> {
+
+                    String payer = payerField.getText().toString().trim();
+                    String amountString = amountField.getText().toString().trim();
+                    String description = descriptionField.getText().toString().trim();
+
+                    if (payer.isEmpty() || amountString.isEmpty()
+                            || description.isEmpty()) {
+                        Toast.makeText(this,
+                                "Please fill all fields",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    try {
+                        long amountPaise = new BigDecimal(amountString)
+                                .movePointRight(2)
+                                .longValueExact();
+
+                        if (amountPaise <= 0) {
+                            Toast.makeText(this,
+                                    "Amount must be greater than zero",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        expense.setPayer(payer);
+                        expense.setAmountPaise(amountPaise);
+                        expense.setDescription(description);
+
+                        expenseRepository.updateExpense(expense, () -> {
+                            refreshExpenses();
+                            Toast.makeText(this,
+                                    "Expense updated",
+                                    Toast.LENGTH_SHORT).show();
+                        });
+
+                    } catch (NumberFormatException | ArithmeticException e) {
+                        Toast.makeText(this,
+                                "Enter a valid amount (maximum 2 decimal places)",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                })
+                .show();
+    }
+
+    private void confirmDeleteExpense(Expense expense) {
+
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Expense?")
+                .setMessage("Are you sure you want to delete \""
+                        + expense.getDescription() + "\"?")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Delete", (dialog, which) -> {
+
+                    expenseRepository.deleteExpense(expense, () -> {
+                        refreshExpenses();
+                        Toast.makeText(this,
+                                "Expense deleted",
+                                Toast.LENGTH_SHORT).show();
+                    });
+
+                })
+                .show();
     }
 
     private void confirmDeleteTrip() {

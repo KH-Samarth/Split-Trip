@@ -173,15 +173,25 @@
             app:strokeColor="#E8ECF3"
             app:cardBackgroundColor="#FFFFFF">
 
-            <TextView
-                android:id="@+id/expenseLogText"
+            <LinearLayout
+                android:id="@+id/expenseListContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="No expenses recorded yet."
-                android:textColor="#526078"
-                android:textSize="14sp"
-                android:padding="18dp"
-                android:lineSpacingExtra="6dp" />
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/expenseEmptyText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No expenses recorded yet."
+                    android:textColor="#526078"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:padding="18dp"
+                    android:visibility="visible"/>
+
+            </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
