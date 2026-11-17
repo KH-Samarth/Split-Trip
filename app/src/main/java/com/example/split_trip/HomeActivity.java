@@ -25,6 +25,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private TripRepository tripRepository;
     private LinearLayout tripListContainer;
+    private TextView dashboardTripCount;
+    private TextView dashboardEmptyText;
+    private LinearLayout dashboardRecentTripsContainer;
 
     private ScrollView homeScreen;
     private ScrollView tripsScreen;
@@ -38,6 +41,10 @@ public class HomeActivity extends AppCompatActivity {
         tripRepository = new TripRepository(this);
 
         tripListContainer = findViewById(R.id.tripListContainer);
+        dashboardTripCount = findViewById(R.id.dashboardTripCount);
+        dashboardEmptyText = findViewById(R.id.dashboardEmptyText);
+        dashboardRecentTripsContainer =
+                findViewById(R.id.dashboardRecentTripsContainer);
 
         Button newTripButton = findViewById(R.id.newTripButton);
         newTripButton.setOnClickListener(v -> showCreateTripDialog());
@@ -86,6 +93,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         refreshTripList();
+        refreshDashboard();
     }
 
     private void showCreateTripDialog() {
@@ -162,6 +170,58 @@ public class HomeActivity extends AppCompatActivity {
                 });
 
                 tripListContainer.addView(tripCard);
+            }
+        });
+    }
+    private void refreshDashboard() {
+
+        tripRepository.getAllTrips(trips -> {
+
+            dashboardTripCount.setText(String.valueOf(trips.size()));
+
+            dashboardRecentTripsContainer.removeAllViews();
+
+            if (trips.isEmpty()) {
+                dashboardEmptyText.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            dashboardEmptyText.setVisibility(View.GONE);
+
+            LayoutInflater inflater = LayoutInflater.from(this);
+
+            // Display up to the three most recently created trips.
+            int count = Math.min(3, trips.size());
+
+            for (int i = 0; i < count; i++) {
+
+                Trip trip = trips.get(i);
+
+                View tripCard = inflater.inflate(
+                        R.layout.item_trip,
+                        dashboardRecentTripsContainer,
+                        false
+                );
+
+                TextView tripNameText =
+                        tripCard.findViewById(R.id.tripNameText);
+
+                tripNameText.setText(trip.getName());
+
+                tripCard.setOnClickListener(v -> {
+
+                    Intent intent = new Intent(
+                            HomeActivity.this,
+                            MainActivity.class
+                    );
+
+                    intent.putExtra("TRIP_ID", trip.getId());
+                    intent.putExtra("TRIP_TITLE", trip.getName());
+
+                    startActivity(intent);
+                });
+
+                dashboardRecentTripsContainer.addView(tripCard);
             }
         });
     }
