@@ -708,6 +708,8 @@
     </FrameLayout>
 
     <!-- BOTTOM NAVIGATION -->
+
+
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
@@ -718,5 +720,7 @@
         app:itemIconTint="#3159A5"
         app:itemTextColor="#3159A5"
         app:elevation="8dp" />
+
+
 
 </LinearLayout>

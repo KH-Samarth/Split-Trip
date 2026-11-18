@@ -4,10 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
-    app:cardCornerRadius="14dp"
-    app:cardElevation="1dp"
-    app:strokeColor="#E8EAF0"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E8ECF3"
     app:strokeWidth="1dp"
     app:cardBackgroundColor="#FFFFFF">
 
@@ -23,10 +23,30 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="#EAF0FC">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="₹"
+                    android:textColor="#3159A5"
+                    android:textSize="22sp"
+                    android:textStyle="bold"/>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginStart="13dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -34,9 +54,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Dinner"
-                    android:textColor="#202633"
+                    android:textColor="#172554"
                     android:textSize="16sp"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold"
+                    android:maxLines="2"
+                    android:ellipsize="end"/>
 
                 <TextView
                     android:id="@+id/expensePayerText"
@@ -44,8 +66,18 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:text="Paid by Sam"
-                    android:textColor="#747B8A"
-                    android:textSize="13sp"/>
+                    android:textColor="#8490A5"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/expenseDateText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="18 Nov 2026 · 8:15 PM"
+                    android:textColor="#9AA4B5"
+                    android:textSize="11sp"/>
+
 
             </LinearLayout>
 
@@ -53,6 +85,7 @@
                 android:id="@+id/expenseAmountText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 android:text="₹450.00"
                 android:textColor="#3159A5"
                 android:textSize="17sp"
@@ -63,9 +96,9 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="8dp"
-            android:background="#EEF0F4"/>
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="7dp"
+            android:background="#EEF1F6"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -79,7 +112,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:text="Edit"
-                android:textColor="#3159A5"/>
+                android:textColor="#3159A5"
+                android:textSize="13sp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/deleteExpenseButton"
@@ -87,7 +121,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:text="Delete"
-                android:textColor="#C04444"/>
+                android:textColor="#C04444"
+                android:textSize="13sp"/>
 
         </LinearLayout>
 

@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="20dp"
+        android:clipToPadding="false">
 
         <!-- Header -->
         <LinearLayout
@@ -48,6 +49,7 @@
 
         </LinearLayout>
 
+
         <!-- Spending Overview -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
@@ -60,7 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="22dp">
+                android:padding="24dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -68,7 +70,8 @@
                     android:text="TOTAL TRIP EXPENSES"
                     android:textColor="#DCE7FF"
                     android:textSize="12sp"
-                    android:letterSpacing="0.08" />
+                    android:textStyle="bold"
+                    android:letterSpacing="0.10" />
 
                 <TextView
                     android:id="@+id/totalSpentText"
@@ -76,13 +79,30 @@
                     android:layout_height="wrap_content"
                     android:text="Total Trip Cost: ₹0"
                     android:textColor="#FFFFFF"
-                    android:textSize="29sp"
+                    android:textSize="28sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="10dp" />
+                    android:layout_marginTop="12dp"
+                    android:maxLines="2"
+                    android:ellipsize="end" />
+
+                <View
+                    android:layout_width="48dp"
+                    android:layout_height="3dp"
+                    android:layout_marginTop="16dp"
+                    android:background="#AFC8FF" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Keep track of every shared expense"
+                    android:textColor="#DCE7FF"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
+
 
 
         <com.google.android.material.card.MaterialCardView
@@ -179,6 +199,10 @@
                 android:padding="18dp">
 
                 <EditText
+                    android:textColor="#172554"
+                    android:textColorHint="#8490A5"
+                    android:backgroundTint="#3159A5"
+                    android:textSize="15sp"
                     android:id="@+id/payerInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -188,6 +212,10 @@
                     android:padding="14dp" />
 
                 <EditText
+                    android:textColor="#172554"
+                    android:textColorHint="#8490A5"
+                    android:backgroundTint="#3159A5"
+                    android:textSize="15sp"
                     android:id="@+id/amountInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -198,6 +226,10 @@
                     android:padding="14dp" />
 
                 <EditText
+                    android:textColor="#172554"
+                    android:textColorHint="#8490A5"
+                    android:backgroundTint="#3159A5"
+                    android:textSize="15sp"
                     android:id="@+id/descInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -272,7 +304,7 @@
             android:textAllCaps="false"
             android:textColor="#C62828"
             android:layout_marginTop="24dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="180dp"
             app:backgroundTint="#FCEAEA"
             app:cornerRadius="12dp" />
 

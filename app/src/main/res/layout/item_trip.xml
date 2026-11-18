@@ -7,7 +7,8 @@
     android:layout_marginBottom="12dp"
     android:clickable="true"
     android:focusable="true"
-    app:cardCornerRadius="16dp"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="18dp"
     app:cardElevation="0dp"
     app:strokeWidth="1dp"
     app:strokeColor="#E8ECF3"
@@ -18,16 +19,27 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:minHeight="82dp">
 
-        <TextView
-            android:id="@+id/tripIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:gravity="center"
-            android:text="✈"
-            android:textSize="23sp"
-            android:background="#EAF0FC" />
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:cardCornerRadius="14dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="#EAF0FC">
+
+            <TextView
+                android:id="@+id/tripIcon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="✈"
+                android:textSize="23sp"
+                android:textColor="#3159A5" />
+
+        </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -53,7 +65,7 @@
                 android:text="View trip expenses and details"
                 android:textColor="#8490A5"
                 android:textSize="12sp"
-                android:layout_marginTop="5dp" />
+                android:layout_marginTop="6dp" />
 
         </LinearLayout>
 
@@ -62,7 +74,7 @@
             android:layout_height="wrap_content"
             android:text="›"
             android:textColor="#3159A5"
-            android:textSize="28sp"
+            android:textSize="30sp"
             android:layout_marginStart="8dp" />
 
     </LinearLayout>

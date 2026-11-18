@@ -25,6 +25,9 @@ import com.example.split_trip.models.TripMember;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -53,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().setSoftInputMode(
+                android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE
+        );
 
         tripId = getIntent().getIntExtra("TRIP_ID", -1);
         tripTitle = getIntent().getStringExtra("TRIP_TITLE");
@@ -191,11 +197,22 @@ public class MainActivity extends AppCompatActivity {
                     TextView payerText =
                             expenseCard.findViewById(R.id.expensePayerText);
 
+                    TextView dateText =
+                            expenseCard.findViewById(R.id.expenseDateText);
+
                     TextView amountText =
                             expenseCard.findViewById(R.id.expenseAmountText);
 
                     descriptionText.setText(expense.getDescription());
                     payerText.setText("Paid by " + expense.getPayer());
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(
+                            "dd MMM yyyy · hh:mm a",
+                            Locale.getDefault()
+                    );
+
+                    dateText.setText(dateFormat.format(
+                            new Date(expense.getCreatedAt())
+                    ));
 
                     String amount = BigDecimal.valueOf(
                             expense.getAmountPaise(), 2
