@@ -4,15 +4,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F6FA">
+    android:background="#FFF9F0">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <!-- HOME SCREEN -->
 
+
+        <!-- HOME SCREEN -->
         <ScrollView
             android:id="@+id/home_screen"
             android:layout_width="match_parent"
@@ -23,310 +24,359 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="22dp">
+                android:padding="20dp"
+                android:background="#FFF9F0">
 
-                <!-- Welcome header -->
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- JOURNAL HEADER -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="SPLIT-TRIP"
-                    android:textColor="#64748B"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.15" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="✈  SPLIT-TRIP JOURNAL"
+                        android:textColor="#8069C8"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="✦  TRAVEL EDITION"
+                        android:textColor="#C17B55"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:background="#FCE8D8"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="7dp"/>
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Your trips,\nyour way."
-                    android:textColor="#172554"
+                    android:text="Let's make some\nmemories!"
+                    android:textColor="#352B4B"
                     android:textSize="30sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="12dp" />
+                    android:layout_marginTop="18dp"/>
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Plan together, track expenses and make every journey easier."
-                    android:textColor="#64748B"
+                    android:text="Your adventures, plans and shared expenses — all in one little place."
+                    android:textColor="#81788A"
                     android:textSize="14sp"
+                    android:lineSpacingExtra="3dp"
                     android:layout_marginTop="8dp"
-                    android:layout_marginBottom="22dp" />
+                    android:layout_marginBottom="22dp"/>
 
-                <!-- Main feature card -->
+                <!-- TRAVEL CALENDAR -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="#233B73"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="#7965C8"
                     app:strokeWidth="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="22dp">
+                        android:padding="20dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="TRAVEL WITHOUT THE HASSLE"
-                            android:textColor="#B9C9EE"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:letterSpacing="0.12" />
-
-                        <TextView
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="More memories.\nLess money confusion."
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="✦  YOUR TRAVEL CALENDAR"
+                                android:textColor="#EAE3FF"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:letterSpacing="0.08"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="📌"
+                                android:textSize="20sp"/>
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/calendarMonth"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="November 2026"
                             android:textColor="#FFFFFF"
                             android:textSize="23sp"
                             android:textStyle="bold"
-                            android:layout_marginTop="12dp" />
+                            android:layout_marginTop="16dp"/>
 
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Keep group expenses organised, know who paid and make sharing costs simpler."
-                            android:textColor="#D6E0F5"
-                            android:textSize="13sp"
-                            android:layout_marginTop="10dp" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Main sections -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="YOUR TRAVEL HUB"
-                    android:textColor="#64748B"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.12"
-                    android:layout_marginTop="28dp"
-                    android:layout_marginBottom="12dp" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#E2E8F0"
-                    app:cardBackgroundColor="#FFFFFF">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="18dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="My Trips"
-                            android:textColor="#172554"
-                            android:textSize="17sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Create trips, manage participants and keep all your travel plans organised in one place."
-                            android:textColor="#64748B"
-                            android:textSize="13sp"
-                            android:layout_marginTop="6dp" />
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#E2E8F0"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="16dp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Expense Tracking"
-                            android:textColor="#172554"
-                            android:textSize="17sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Record payments, monitor trip spending and maintain a clear expense history."
-                            android:textColor="#64748B"
-                            android:textSize="13sp"
-                            android:layout_marginTop="6dp" />
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#E2E8F0"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="16dp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Group Management"
-                            android:textColor="#172554"
-                            android:textSize="17sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Keep track of everyone travelling together and organise shared trip information."
-                            android:textColor="#64748B"
-                            android:textSize="13sp"
-                            android:layout_marginTop="6dp" />
-
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-
-                <!-- Dashboard trip overview -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="YOUR ACTIVITY"
-                    android:textColor="#64748B"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.12"
-                    android:layout_marginTop="28dp"
-                    android:layout_marginBottom="12dp" />
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#E2E8F0"
-                    app:cardBackgroundColor="#FFFFFF">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="18dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Trips created"
-                            android:textColor="#64748B"
-                            android:textSize="13sp" />
-
-                        <TextView
-                            android:id="@+id/dashboardTripCount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="0"
-                            android:textColor="#172554"
-                            android:textSize="32sp"
-                            android:textStyle="bold"
-                            android:layout_marginTop="4dp" />
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:background="#E2E8F0"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="16dp" />
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Recently created trips"
-                            android:textColor="#172554"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/dashboardEmptyText"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Your trips will appear here once you create one."
-                            android:textColor="#94A3B8"
-                            android:textSize="13sp"
-                            android:layout_marginTop="12dp"
-                            android:visibility="visible" />
-
+                        <!-- WEEKDAY LABELS -->
                         <LinearLayout
-                            android:id="@+id/dashboardRecentTripsContainer"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:layout_marginTop="8dp" />
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:layout_marginTop="20dp">
 
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="S"
+                                android:textColor="#EAE3FF"
+                                android:textSize="12sp"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="M"
+                                android:textColor="#EAE3FF"
+                                android:textSize="12sp"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="T"
+                                android:textColor="#EAE3FF"
+                                android:textSize="12sp"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="W"
+                                android:textColor="#EAE3FF"
+                                android:textSize="12sp"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="T"
+                                android:textColor="#EAE3FF"
+                                android:textSize="12sp"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="F"
+                                android:textColor="#EAE3FF"
+                                android:textSize="12sp"
+                                android:textStyle="bold"/>
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:text="S"
+                                android:textColor="#EAE3FF"
+                                android:textSize="12sp"
+                                android:textStyle="bold"/>
+                        </LinearLayout>
+
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="18dp"
+                            app:cardCornerRadius="17dp"
+                            app:cardElevation="0dp"
+                            app:cardBackgroundColor="#FFFFFF"
+                            app:strokeWidth="0dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical"
+                                android:gravity="center"
+                                android:padding="18dp">
+
+                                <TextView
+                                    android:id="@+id/calendarEmptyText"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="No trips scheduled ✈"
+                                    android:textColor="#51458C"
+                                    android:textSize="17sp"
+                                    android:textStyle="bold"
+                                    android:gravity="center"/>
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:text="Your travel plans will find a home here."
+                                    android:textColor="#8C849E"
+                                    android:textSize="12sp"
+                                    android:gravity="center"
+                                    android:layout_marginTop="6dp"/>
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="A little space for your next big adventure."
+                            android:textColor="#EAE3FF"
+                            android:textSize="11sp"
+                            android:gravity="center"
+                            android:layout_marginTop="14dp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-
-                <!-- Future development -->
-                <TextView
+                <!-- UPCOMING TRIPS -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="WHAT'S NEXT?"
-                    android:textColor="#64748B"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    android:letterSpacing="0.12"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
                     android:layout_marginTop="28dp"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Next adventures"
+                        android:textColor="#352B4B"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="COMING UP  ✦"
+                        android:textColor="#BD7954"
+                        android:textSize="10sp"
+                        android:textStyle="bold"/>
+                </LinearLayout>
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp"
-                    app:cardBackgroundColor="#EAF0FA">
+                    app:cardCornerRadius="21dp"
+                    app:cardElevation="1dp"
+                    app:cardBackgroundColor="#FCE9D9"
+                    app:strokeWidth="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
                         android:padding="18dp">
 
                         <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Smarter group finances"
-                            android:textColor="#172554"
-                            android:textSize="17sp"
-                            android:textStyle="bold" />
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
+                            android:gravity="center"
+                            android:text="🧳"
+                            android:textSize="27sp"
+                            android:background="#FFF7ED"/>
 
                         <TextView
-                            android:layout_width="match_parent"
+                            android:id="@+id/upcomingTripsEmpty"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="We're working towards shared expense calculations, individual balances, settlement suggestions and spending insights."
-                            android:textColor="#475569"
+                            android:layout_weight="1"
+                            android:text="No upcoming trips yet. Your next adventure could start with a new trip!"
+                            android:textColor="#76523F"
                             android:textSize="13sp"
-                            android:layout_marginTop="7dp" />
-
+                            android:lineSpacingExtra="3dp"
+                            android:layout_marginStart="14dp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- RECENT TRIPS -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="29dp"
+                    android:layout_marginBottom="13dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Your travel scrapbook"
+                        android:textColor="#352B4B"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/dashboardTripCount"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:text="0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:background="#7965C8"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/dashboardEmptyText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Your first trip is waiting to be written about. ✨"
+                    android:textColor="#82788B"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:padding="20dp"
+                    android:background="#F1EBDD"
+                    android:visibility="visible"/>
+
+                <LinearLayout
+                    android:id="@+id/dashboardRecentTripsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+                <!-- FOOTER -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Travel together. Split smarter."
-                    android:textColor="#94A3B8"
+                    android:text="Made for memories, not spreadsheets."
+                    android:textColor="#A69AA7"
                     android:textSize="12sp"
                     android:gravity="center"
-                    android:layout_marginTop="28dp"
-                    android:layout_marginBottom="12dp" />
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="18dp"/>
 
             </LinearLayout>
         </ScrollView>
+
+
+
 
 
         <!-- TRIPS SCREEN -->
@@ -335,38 +385,113 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            android:fillViewport="true">
+            android:fillViewport="true"
+            android:background="#FFF9F0">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="22dp">
+                android:padding="22dp"
+                android:clipToPadding="false">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SPLIT-TRIP JOURNAL"
+                    android:textColor="#C58A65"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.14" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="My Trips"
-                    android:textColor="#172554"
+                    android:text="Every trip has\na story to tell. ♡"
+                    android:textColor="#332B50"
                     android:textSize="29sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:layout_marginTop="9dp" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="All your adventures, together."
-                    android:textColor="#64748B"
+                    android:text="Your little collection of big adventures."
+                    android:textColor="#89819D"
                     android:textSize="14sp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginBottom="22dp" />
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="25dp" />
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="18dp"
-                    app:cardElevation="1dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:strokeWidth="0dp">
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#EEDCCB"
+                    app:cardBackgroundColor="#FCE9D9">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="17dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="A collection of places,\npeople and memories."
+                            android:textColor="#72513F"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="✈  ✦"
+                            android:textColor="#C58A65"
+                            android:textSize="25sp" />
+
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="28dp"
+                    android:layout_marginBottom="13dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="My adventures"
+                        android:textColor="#332B50"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="✧"
+                        android:textColor="#C58A65"
+                        android:textSize="22sp" />
+
+                </LinearLayout>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="#F0DFD1"
+                    app:cardBackgroundColor="#FFFFFF">
 
                     <LinearLayout
                         android:id="@+id/tripListContainer"
@@ -381,18 +506,30 @@
                     android:id="@+id/newTripButton"
                     android:layout_width="match_parent"
                     android:layout_height="58dp"
-                    android:text="+   Create a new trip"
+                    android:text="+   Start a new adventure"
                     android:textAllCaps="false"
                     android:textSize="15sp"
                     android:textStyle="bold"
                     android:textColor="#FFFFFF"
                     android:layout_marginTop="20dp"
-                    app:cornerRadius="16dp"
-                    app:backgroundTint="#3159A5"
+                    android:layout_marginBottom="25dp"
+                    app:cornerRadius="17dp"
+                    app:backgroundTint="#7965C8"
                     app:elevation="0dp" />
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="The best stories start with a journey. ♡"
+                    android:textColor="#B19A8A"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="20dp" />
+
             </LinearLayout>
+
         </ScrollView>
+
 
         <!-- PROFILE SCREEN -->
 

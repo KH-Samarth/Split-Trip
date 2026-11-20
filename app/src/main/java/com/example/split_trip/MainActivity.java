@@ -44,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView totalSpentText;
     private LinearLayout expenseListContainer;
     private TextView expenseEmptyText;
+    private LinearLayout itinerarySection;
+    private LinearLayout expensesSection;
+
+    private com.google.android.material.button.MaterialButton itineraryTabButton;
+    private com.google.android.material.button.MaterialButton expensesTabButton;
 
     private EditText payerInput;
     private EditText amountInput;
@@ -89,6 +94,18 @@ public class MainActivity extends AppCompatActivity {
         totalSpentText = findViewById(R.id.totalSpentText);
         expenseListContainer = findViewById(R.id.expenseListContainer);
         expenseEmptyText = findViewById(R.id.expenseEmptyText);
+
+        itinerarySection = findViewById(R.id.itinerarySection);
+        expensesSection = findViewById(R.id.expensesSection);
+
+        itineraryTabButton = findViewById(R.id.itineraryTabButton);
+        expensesTabButton = findViewById(R.id.expensesTabButton);
+
+        itineraryTabButton.setOnClickListener(v -> showTripSection(true));
+        expensesTabButton.setOnClickListener(v -> showTripSection(false));
+
+// Open the trip on the Itinerary section by default.
+        showTripSection(true);
 
         payerInput = findViewById(R.id.payerInput);
         amountInput = findViewById(R.id.amountInput);
@@ -476,6 +493,42 @@ public class MainActivity extends AppCompatActivity {
                 memberListContainer.addView(memberRow);
             }
         });
+    }
+    private void showTripSection(boolean showItinerary) {
+
+        itinerarySection.setVisibility(
+                showItinerary ? View.VISIBLE : View.GONE
+        );
+
+        expensesSection.setVisibility(
+                showItinerary ? View.GONE : View.VISIBLE
+        );
+
+        int selectedColor = android.graphics.Color.parseColor("#7965C8");
+        int unselectedColor = android.graphics.Color.parseColor("#EEE9FF");
+
+        int selectedTextColor = android.graphics.Color.WHITE;
+        int unselectedTextColor = android.graphics.Color.parseColor("#7965C8");
+
+        itineraryTabButton.setBackgroundTintList(
+                android.content.res.ColorStateList.valueOf(
+                        showItinerary ? selectedColor : unselectedColor
+                )
+        );
+
+        expensesTabButton.setBackgroundTintList(
+                android.content.res.ColorStateList.valueOf(
+                        showItinerary ? unselectedColor : selectedColor
+                )
+        );
+
+        itineraryTabButton.setTextColor(
+                showItinerary ? selectedTextColor : unselectedTextColor
+        );
+
+        expensesTabButton.setTextColor(
+                showItinerary ? unselectedTextColor : selectedTextColor
+        );
     }
 
 }
