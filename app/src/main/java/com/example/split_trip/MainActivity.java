@@ -9,6 +9,9 @@ import android.widget.Toast;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.app.DatePickerDialog;
+import android.widget.DatePicker;
+import java.util.Calendar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,9 +22,11 @@ import com.example.split_trip.models.Expense;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.LayoutInflater;
+import com.example.split_trip.models.VisitedPlace;
 
 import com.example.split_trip.database.TripMemberRepository;
 import com.example.split_trip.models.TripMember;
+import com.example.split_trip.database.VisitedPlaceRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private ExpenseRepository expenseRepository;
     private TripRepository tripRepository;
     private TripMemberRepository tripMemberRepository;
+    private VisitedPlaceRepository visitedPlaceRepository;
     private LinearLayout memberListContainer;
     private TextView memberEmptyText;
     private Button addMemberButton;
@@ -79,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         expenseRepository = new ExpenseRepository(this);
         tripRepository = new TripRepository(this);
         tripMemberRepository = new TripMemberRepository(this);
+        visitedPlaceRepository = new VisitedPlaceRepository(this);
 
         memberListContainer = findViewById(R.id.memberListContainer);
         memberEmptyText = findViewById(R.id.memberEmptyText);
@@ -97,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
 
         itinerarySection = findViewById(R.id.itinerarySection);
         expensesSection = findViewById(R.id.expensesSection);
+        Button addActivityButton = findViewById(R.id.addActivityButton);
+        addActivityButton.setOnClickListener(v -> showAddPlaceDialog(null));
 
         itineraryTabButton = findViewById(R.id.itineraryTabButton);
         expensesTabButton = findViewById(R.id.expensesTabButton);
@@ -531,4 +540,192 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+    private void showAddPlaceDialog(VisitedPlace existingPlace) {
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(48, 16, 48, 8);
+
+        EditText nameInput = new EditText(this);
+        nameInput.setHint("Place name");
+        nameInput.setSingleLine(true);
+        layout.addView(nameInput);
+
+        EditText locationInput = new EditText(this);
+        locationInput.setHint("Location (e.g. Mysuru, Karnataka)");
+        locationInput.setSingleLine(true);
+        layout.addView(locationInput);
+
+        Button dateButton = new Button(this);
+        dateButton.setText("Choose visit date");
+        layout.addView(dateButton);
+
+        EditText noteInput = new EditText(this);
+        noteInput.setHint("Write a little memory (optional)");
+        noteInput.setMinLines(2);
+        noteInput.setGravity(android.view.Gravity.TOP);
+        layout.addView(noteInput);
+
+        final long[] selectedDate = {System.currentTimeMillis()};
+
+        java.text.SimpleDateFormat dateFormat =
+                new java.text.SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+
+        dateButton.setText(dateFormat.format(new Date(selectedDate[0])));
+
+        dateButton.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(selectedDate[0]);
+
+            DatePickerDialog picker = new DatePickerDialog(
+                    this,
+                    (view, year, month, day) -> {
+                        Calendar chosen = Calendar.getInstance();
+                        chosen.set(year, month, day);
+                        selectedDate[0] = chosen.getTimeInMillis();
+                        dateButton.setText(dateFormat.format(chosen.getTime()));
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            );
+
+            picker.show();
+        });
+
+        if (existingPlace != null) {
+            nameInput.setText(existingPlace.getName());
+            locationInput.setText(existingPlace.getLocation());
+            noteInput.setText(existingPlace.getNote());
+            selectedDate[0] = existingPlace.getVisitDate();
+            dateButton.setText(dateFormat.format(new Date(selectedDate[0])));
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(existingPlace == null ? "Add a visited place" : "Edit visited place")
+                .setView(layout)
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton(existingPlace == null ? "Save place" : "Update", (dialog, which) -> {
+
+                    String name = nameInput.getText().toString().trim();
+                    String location = locationInput.getText().toString().trim();
+                    String note = noteInput.getText().toString().trim();
+
+                    if (name.isEmpty()) {
+                        Toast.makeText(this, "Please enter a place name", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if (existingPlace == null) {
+                        VisitedPlace place = new VisitedPlace(
+                                tripId, name, location, selectedDate[0], note
+                        );
+
+                        visitedPlaceRepository.insertPlace(place, placeId -> refreshVisitedPlaces());
+
+                    } else {
+                        existingPlace.setName(name);
+                        existingPlace.setLocation(location);
+                        existingPlace.setVisitDate(selectedDate[0]);
+                        existingPlace.setNote(note);
+
+                        visitedPlaceRepository.updatePlace(existingPlace, this::refreshVisitedPlaces);
+                    }
+                })
+                .show();
+    }
+    private void refreshVisitedPlaces() {
+
+        LinearLayout placeListContainer =
+                findViewById(R.id.itineraryListContainer);
+
+        View emptyCard = findViewById(R.id.itineraryEmptyCard);
+
+        visitedPlaceRepository.getPlacesByTripId(tripId, places -> {
+
+            placeListContainer.removeAllViews();
+
+            if (places.isEmpty()) {
+                emptyCard.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            emptyCard.setVisibility(View.GONE);
+
+            LayoutInflater inflater = LayoutInflater.from(this);
+
+            for (VisitedPlace place : places) {
+
+                View placeCard = inflater.inflate(
+                        R.layout.item_visited_place,
+                        placeListContainer,
+                        false
+                );
+
+                TextView nameText =
+                        placeCard.findViewById(R.id.placeNameText);
+
+                TextView locationText =
+                        placeCard.findViewById(R.id.placeLocationText);
+
+                TextView dateText =
+                        placeCard.findViewById(R.id.placeDateText);
+
+                TextView noteText =
+                        placeCard.findViewById(R.id.placeNoteText);
+
+                Button editButton =
+                        placeCard.findViewById(R.id.editPlaceButton);
+
+                Button deleteButton =
+                        placeCard.findViewById(R.id.deletePlaceButton);
+
+                nameText.setText(place.getName());
+
+                if (place.getLocation() == null ||
+                        place.getLocation().trim().isEmpty()) {
+                    locationText.setVisibility(View.GONE);
+                } else {
+                    locationText.setVisibility(View.VISIBLE);
+                    locationText.setText("📍 " + place.getLocation());
+                }
+
+                SimpleDateFormat dateFormat =
+                        new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+
+                dateText.setText(
+                        "🗓 Visited on " +
+                                dateFormat.format(new Date(place.getVisitDate()))
+                );
+
+                if (place.getNote() == null ||
+                        place.getNote().trim().isEmpty()) {
+                    noteText.setVisibility(View.GONE);
+                } else {
+                    noteText.setVisibility(View.VISIBLE);
+                    noteText.setText(place.getNote());
+                }
+
+                editButton.setOnClickListener(v ->
+                        showAddPlaceDialog(place)
+                );
+
+                deleteButton.setOnClickListener(v ->
+                        new AlertDialog.Builder(this)
+                                .setTitle("Delete visited place?")
+                                .setMessage("Remove " + place.getName() + " from your memories?")
+                                .setNegativeButton("Cancel", null)
+                                .setPositiveButton("Delete", (dialog, which) ->
+                                        visitedPlaceRepository.deletePlace(
+                                                place,
+                                                this::refreshVisitedPlaces
+                                        )
+                                )
+                                .show()
+                );
+
+                placeListContainer.addView(placeCard);
+            }
+        });
+    }
 }

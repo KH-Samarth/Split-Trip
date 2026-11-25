@@ -107,7 +107,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Your journey, day by day ✦"
+            android:text="Places you've visited ✦"
             android:textColor="#332B50"
             android:textSize="21sp"
             android:textStyle="bold"
@@ -116,7 +116,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="All the little stops that make a trip memorable."
+            android:text="Keep a little record of every place your trip takes you."
             android:textColor="#89819D"
             android:textSize="13sp"
             android:layout_marginBottom="20dp" />
@@ -125,7 +125,7 @@
             android:id="@+id/addActivityButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="+  Add an activity"
+            android:text="+  Add a visited place"
             android:textAllCaps="false"
             android:textSize="15sp"
             android:textColor="#FFFFFF"
@@ -160,7 +160,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Your itinerary starts here!"
+                    android:text="Your memories start here!"
                     android:textColor="#365C49"
                     android:textSize="17sp"
                     android:textStyle="bold"
@@ -171,7 +171,7 @@
                     android:id="@+id/itineraryEmptyText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="No plans added yet. Soon, you'll be able to organise activities, places and timings for every day of your adventure."
+                    android:text="No visited places recorded yet. Add your first stop and save a little memory of your adventure."
                     android:textColor="#64816F"
                     android:textSize="13sp"
                     android:gravity="center"

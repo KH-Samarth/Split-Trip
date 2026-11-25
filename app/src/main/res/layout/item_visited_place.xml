@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="14dp"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="#E9DFD2"
+    app:cardBackgroundColor="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Place title and visited badge -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/placeNameText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Mysore Palace"
+                android:textColor="#332B50"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:maxLines="2" />
+
+            <TextView
+                android:id="@+id/visitedBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#EAF5EF"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                android:text="✓ VISITED"
+                android:textColor="#47745B"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Location -->
+        <TextView
+            android:id="@+id/placeLocationText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="📍 Mysuru, Karnataka"
+            android:textColor="#817995"
+            android:textSize="13sp" />
+
+        <!-- Date -->
+        <TextView
+            android:id="@+id/placeDateText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:text="🗓 Visited on 24 November 2026"
+            android:textColor="#817995"
+            android:textSize="12sp" />
+
+        <!-- Memory note -->
+        <TextView
+            android:id="@+id/placeNoteText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="A wonderful stop filled with history and memories."
+            android:textColor="#514A62"
+            android:textSize="14sp"
+            android:lineSpacingExtra="3dp" />
+
+        <!-- Edit and delete actions -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editPlaceButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Edit"
+                android:textAllCaps="false"
+                android:textColor="#7965C8"
+                app:backgroundTint="#EEE9FF"
+                app:cornerRadius="10dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/deletePlaceButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:text="Delete"
+                android:textAllCaps="false"
+                android:textColor="#B45A5A"
+                app:backgroundTint="#FCEAEA"
+                app:cornerRadius="10dp"
+                app:elevation="0dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

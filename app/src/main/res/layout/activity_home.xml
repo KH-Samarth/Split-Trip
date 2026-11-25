@@ -794,7 +794,7 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- App Information -->
+                <!-- About SplitTrip -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -814,7 +814,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Split-Trip"
+                            android:text="SplitTrip"
                             android:textColor="#2456A6"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -822,12 +822,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Making group expenses simpler."
+                            android:text="Your trips, expenses and memories \u2014 all in one place."
                             android:textColor="#526078"
                             android:textSize="13sp"
+                            android:gravity="center"
                             android:layout_marginTop="5dp" />
 
                         <TextView
+                            android:id="@+id/aboutVersionText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Version 1.0"

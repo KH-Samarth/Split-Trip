@@ -53,6 +53,16 @@ public class HomeActivity extends AppCompatActivity {
         tripsScreen = findViewById(R.id.trips_screen);
         profileScreen = findViewById(R.id.profile_screen);
 
+        try {
+            String versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            TextView aboutVersionText = findViewById(R.id.aboutVersionText);
+            if (aboutVersionText != null) {
+                aboutVersionText.setText("Version " + versionName);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         BottomNavigationView bottomNavigation =
                 findViewById(R.id.bottomNavigation);
 
