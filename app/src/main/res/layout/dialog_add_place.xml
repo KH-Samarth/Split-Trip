@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="22dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="#F0DFD1"
+    app:cardBackgroundColor="#FFFEFA">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="22dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/dialogTitleText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Add Place"
+                android:textColor="#332B50"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✈️"
+                android:textSize="22sp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dialogSubtitleText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Record your adventure and itinerary stops."
+            android:textColor="#89819D"
+            android:textSize="13sp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="18dp" />
+
+        <!-- Place Name Input -->
+        <EditText
+            android:id="@+id/dialogNameInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Place name (e.g. Mysore Palace)"
+            android:singleLine="true"
+            android:inputType="textCapWords"
+            android:textColor="#172554"
+            android:textColorHint="#8490A5"
+            android:textSize="15sp"
+            android:backgroundTint="#7965C8"
+            android:padding="14dp" />
+
+        <!-- Location Input -->
+        <EditText
+            android:id="@+id/dialogLocationInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Location (optional)"
+            android:singleLine="true"
+            android:inputType="textCapWords"
+            android:textColor="#172554"
+            android:textColorHint="#8490A5"
+            android:textSize="15sp"
+            android:backgroundTint="#7965C8"
+            android:layout_marginTop="12dp"
+            android:padding="14dp" />
+
+        <!-- Date Selection Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/dialogDateButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="🗓 Choose date"
+            android:textAllCaps="false"
+            android:textColor="#7965C8"
+            android:textSize="15sp"
+            android:layout_marginTop="14dp"
+            app:backgroundTint="#EEE9FF"
+            app:cornerRadius="14dp"
+            app:elevation="0dp"
+            android:gravity="start|center_vertical"
+            android:paddingStart="16dp" />
+
+        <!-- Note Input -->
+        <EditText
+            android:id="@+id/dialogNoteInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Personal note or memory (optional)"
+            android:minLines="3"
+            android:gravity="top"
+            android:inputType="textCapSentences|textMultiLine"
+            android:textColor="#172554"
+            android:textColorHint="#8490A5"
+            android:textSize="15sp"
+            android:backgroundTint="#7965C8"
+            android:layout_marginTop="12dp"
+            android:padding="14dp" />
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/dialogCancelButton"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:text="Cancel"
+                android:textAllCaps="false"
+                android:textColor="#89819D"
+                app:backgroundTint="#F3F5FA"
+                app:cornerRadius="12dp"
+                app:elevation="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/dialogSaveButton"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:layout_marginStart="10dp"
+                android:text="Save"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                app:backgroundTint="#7965C8"
+                app:cornerRadius="12dp"
+                app:elevation="0dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

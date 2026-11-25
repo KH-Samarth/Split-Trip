@@ -36,6 +36,10 @@ public class TripRepository {
         void onLoaded(List<Trip> trips);
     }
 
+    public interface OnTripLoadedListener {
+        void onLoaded(Trip trip);
+    }
+
     public interface OnOperationCompleteListener {
         void onComplete();
     }
@@ -68,6 +72,23 @@ public class TripRepository {
             if (listener != null) {
                 mainHandler.post(() ->
                         listener.onLoaded(trips)
+                );
+            }
+        });
+    }
+
+    public void getTripById(
+            int tripId,
+            OnTripLoadedListener listener
+    ) {
+
+        executor.execute(() -> {
+
+            Trip trip = tripDao.getTripById(tripId);
+
+            if (listener != null) {
+                mainHandler.post(() ->
+                        listener.onLoaded(trip)
                 );
             }
         });

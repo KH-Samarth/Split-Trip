@@ -278,6 +278,7 @@
                 </LinearLayout>
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/upcomingTripsEmptyCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:cardCornerRadius="21dp"
@@ -313,6 +314,12 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <LinearLayout
+                    android:id="@+id/upcomingTripsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
                 <!-- RECENT TRIPS -->
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -326,21 +333,10 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Your travel scrapbook"
+                        android:text="Recently completed trips"
                         android:textColor="#352B4B"
                         android:textSize="20sp"
                         android:textStyle="bold"/>
-
-                    <TextView
-                        android:id="@+id/dashboardTripCount"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:text="0"
-                        android:textColor="#FFFFFF"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:gravity="center"
-                        android:background="#7965C8"/>
                 </LinearLayout>
 
                 <TextView
@@ -839,6 +835,21 @@
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
+                <!-- Logout Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/logoutButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="24dp"
+                    android:text="Log Out"
+                    android:textAllCaps="false"
+                    android:textColor="#B45A5A"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:backgroundTint="#FCEAEA"
+                    app:cornerRadius="16dp"
+                    app:elevation="0dp" />
 
             </LinearLayout>
         </ScrollView>

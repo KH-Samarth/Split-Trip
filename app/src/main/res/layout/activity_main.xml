@@ -34,18 +34,47 @@
                 android:backgroundTint="#EAF0FC"
                 android:padding="0dp" />
 
-            <TextView
-                android:id="@+id/tripTitleText"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="14dp"
-                android:text="Trip Name"
-                android:textSize="23sp"
-                android:textStyle="bold"
-                android:textColor="#172554"
-                android:maxLines="1"
-                android:ellipsize="end" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tripTitleText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Trip Name"
+                    android:textSize="21sp"
+                    android:textStyle="bold"
+                    android:textColor="#172554"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+                <TextView
+                    android:id="@+id/tripDatesHeaderText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="🗓 24 Nov 2026 – 30 Nov 2026"
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/editTripButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:text="Edit"
+                android:textAllCaps="false"
+                android:textColor="#3159A5"
+                android:textSize="13sp"
+                app:backgroundTint="#EAF0FC"
+                app:cornerRadius="10dp"
+                app:elevation="0dp" />
 
         </LinearLayout>
 
@@ -104,6 +133,101 @@
         android:orientation="vertical"
         android:visibility="visible">
 
+        <!-- PLACES TO VISIT SECTION -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Places to visit ✦"
+            android:textColor="#332B50"
+            android:textSize="21sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="7dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Plan your upcoming stops and itinerary."
+            android:textColor="#89819D"
+            android:textSize="13sp"
+            android:layout_marginBottom="20dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/addPlannedPlaceButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+  Add a place to visit"
+            android:textAllCaps="false"
+            android:textSize="15sp"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="18dp"
+            app:backgroundTint="#3159A5"
+            app:cornerRadius="14dp"
+            app:elevation="0dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/plannedPlaceEmptyCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#DCE7FF"
+            app:cardBackgroundColor="#EAF0FC">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="28dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📍"
+                    android:textSize="42sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No places to visit yet!"
+                    android:textColor="#172554"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:layout_marginTop="14dp" />
+
+                <TextView
+                    android:id="@+id/plannedPlaceEmptyText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Add your upcoming destinations to plan out your trip step by step."
+                    android:textColor="#526078"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:lineSpacingExtra="4dp"
+                    android:layout_marginTop="9dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:id="@+id/plannedPlaceListContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <!-- DIVIDER BETWEEN SECTIONS -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E9DFD2"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="28dp" />
+
+        <!-- PLACES YOU'VE VISITED SECTION -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

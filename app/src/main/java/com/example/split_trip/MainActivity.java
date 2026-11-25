@@ -23,10 +23,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.LayoutInflater;
 import com.example.split_trip.models.VisitedPlace;
+import com.example.split_trip.models.PlannedPlace;
 
 import com.example.split_trip.database.TripMemberRepository;
 import com.example.split_trip.models.TripMember;
 import com.example.split_trip.database.VisitedPlaceRepository;
+import com.example.split_trip.database.PlannedPlaceRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -38,11 +40,13 @@ public class MainActivity extends AppCompatActivity {
 
     private int tripId;
     private String tripTitle;
+    private Trip currentTrip;
 
     private ExpenseRepository expenseRepository;
     private TripRepository tripRepository;
     private TripMemberRepository tripMemberRepository;
     private VisitedPlaceRepository visitedPlaceRepository;
+    private PlannedPlaceRepository plannedPlaceRepository;
     private LinearLayout memberListContainer;
     private TextView memberEmptyText;
     private Button addMemberButton;
@@ -86,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         tripRepository = new TripRepository(this);
         tripMemberRepository = new TripMemberRepository(this);
         visitedPlaceRepository = new VisitedPlaceRepository(this);
+        plannedPlaceRepository = new PlannedPlaceRepository(this);
 
         memberListContainer = findViewById(R.id.memberListContainer);
         memberEmptyText = findViewById(R.id.memberEmptyText);
@@ -104,6 +109,12 @@ public class MainActivity extends AppCompatActivity {
 
         itinerarySection = findViewById(R.id.itinerarySection);
         expensesSection = findViewById(R.id.expensesSection);
+
+        Button addPlannedPlaceButton = findViewById(R.id.addPlannedPlaceButton);
+        if (addPlannedPlaceButton != null) {
+            addPlannedPlaceButton.setOnClickListener(v -> showAddPlannedPlaceDialog(null));
+        }
+
         Button addActivityButton = findViewById(R.id.addActivityButton);
         addActivityButton.setOnClickListener(v -> showAddPlaceDialog(null));
 
@@ -115,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
 
 // Open the trip on the Itinerary section by default.
         showTripSection(true);
+        refreshPlannedPlaces();
+        refreshVisitedPlaces();
 
         payerInput = findViewById(R.id.payerInput);
         amountInput = findViewById(R.id.amountInput);
@@ -123,7 +136,17 @@ public class MainActivity extends AppCompatActivity {
         addExpenseButton = findViewById(R.id.addExpenseButton);
         Button deleteTripButton = findViewById(R.id.deleteTripButton);
 
+        Button editTripButton = findViewById(R.id.editTripButton);
+        if (editTripButton != null) {
+            editTripButton.setOnClickListener(v -> showEditTripDialog());
+        }
+
         tripTitleText.setText(tripTitle);
+
+        tripRepository.getTripById(tripId, trip -> {
+            currentTrip = trip;
+            updateTripHeader();
+        });
 
         backButton.setOnClickListener(v -> finish());
 
@@ -298,55 +321,54 @@ public class MainActivity extends AppCompatActivity {
         layout.addView(amountField);
         layout.addView(descriptionField);
 
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Edit Expense")
                 .setView(layout)
                 .setNegativeButton("Cancel", null)
-                .setPositiveButton("Save", (dialog, which) -> {
+                .setPositiveButton("Save", null)
+                .create();
 
-                    String payer = payerField.getText().toString().trim();
-                    String amountString = amountField.getText().toString().trim();
-                    String description = descriptionField.getText().toString().trim();
+        dialog.setOnShowListener(d -> {
+            Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            positiveButton.setOnClickListener(v -> {
 
-                    if (payer.isEmpty() || amountString.isEmpty()
-                            || description.isEmpty()) {
-                        Toast.makeText(this,
-                                "Please fill all fields",
-                                Toast.LENGTH_SHORT).show();
+                String payer = payerField.getText().toString().trim();
+                String amountString = amountField.getText().toString().trim();
+                String description = descriptionField.getText().toString().trim();
+
+                if (payer.isEmpty() || amountString.isEmpty() || description.isEmpty()) {
+                    Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                try {
+                    long amountPaise = new BigDecimal(amountString)
+                            .movePointRight(2)
+                            .longValueExact();
+
+                    if (amountPaise <= 0) {
+                        Toast.makeText(this, "Amount must be greater than zero", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
-                    try {
-                        long amountPaise = new BigDecimal(amountString)
-                                .movePointRight(2)
-                                .longValueExact();
+                    expense.setPayer(payer);
+                    expense.setAmountPaise(amountPaise);
+                    expense.setDescription(description);
 
-                        if (amountPaise <= 0) {
-                            Toast.makeText(this,
-                                    "Amount must be greater than zero",
-                                    Toast.LENGTH_SHORT).show();
-                            return;
-                        }
+                    expenseRepository.updateExpense(expense, () -> {
+                        refreshExpenses();
+                        Toast.makeText(this, "Expense updated", Toast.LENGTH_SHORT).show();
+                    });
 
-                        expense.setPayer(payer);
-                        expense.setAmountPaise(amountPaise);
-                        expense.setDescription(description);
+                    dialog.dismiss();
 
-                        expenseRepository.updateExpense(expense, () -> {
-                            refreshExpenses();
-                            Toast.makeText(this,
-                                    "Expense updated",
-                                    Toast.LENGTH_SHORT).show();
-                        });
+                } catch (NumberFormatException | ArithmeticException e) {
+                    Toast.makeText(this, "Enter a valid amount (maximum 2 decimal places)", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
 
-                    } catch (NumberFormatException | ArithmeticException e) {
-                        Toast.makeText(this,
-                                "Enter a valid amount (maximum 2 decimal places)",
-                                Toast.LENGTH_SHORT).show();
-                    }
-
-                })
-                .show();
+        dialog.show();
     }
 
     private void confirmDeleteExpense(Expense expense) {
@@ -417,33 +439,38 @@ public class MainActivity extends AppCompatActivity {
         layout.addView(nameInput);
         layout.addView(emailInput);
 
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Add Trip Member")
                 .setView(layout)
                 .setNegativeButton("Cancel", null)
-                .setPositiveButton("Add", (dialog, which) -> {
-                    String name = nameInput.getText().toString().trim();
-                    String email = emailInput.getText().toString().trim();
+                .setPositiveButton("Add", null)
+                .create();
 
-                    if (name.isEmpty()) {
-                        Toast.makeText(this,
-                                "Please enter a name",
-                                Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+        dialog.setOnShowListener(d -> {
+            Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            positiveButton.setOnClickListener(v -> {
+                String name = nameInput.getText().toString().trim();
+                String email = emailInput.getText().toString().trim();
 
-                    TripMember member = new TripMember(
-                            tripId, name, email, false
-                    );
+                if (name.isEmpty()) {
+                    Toast.makeText(this, "Please enter a name", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                    tripMemberRepository.insertMember(member, () -> {
-                        refreshMembers();
-                        Toast.makeText(this,
-                                "Member added",
-                                Toast.LENGTH_SHORT).show();
-                    });
-                })
-                .show();
+                TripMember member = new TripMember(
+                        tripId, name, email, false
+                );
+
+                tripMemberRepository.insertMember(member, () -> {
+                    refreshMembers();
+                    Toast.makeText(this, "Member added", Toast.LENGTH_SHORT).show();
+                });
+
+                dialog.dismiss();
+            });
+        });
+
+        dialog.show();
     }
 
     private void refreshMembers() {
@@ -541,37 +568,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showAddPlaceDialog(VisitedPlace existingPlace) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_add_place, null);
 
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(48, 16, 48, 8);
+        TextView titleText = dialogView.findViewById(R.id.dialogTitleText);
+        TextView subtitleText = dialogView.findViewById(R.id.dialogSubtitleText);
+        EditText nameInput = dialogView.findViewById(R.id.dialogNameInput);
+        EditText locationInput = dialogView.findViewById(R.id.dialogLocationInput);
+        Button dateButton = dialogView.findViewById(R.id.dialogDateButton);
+        EditText noteInput = dialogView.findViewById(R.id.dialogNoteInput);
+        Button cancelButton = dialogView.findViewById(R.id.dialogCancelButton);
+        Button saveButton = dialogView.findViewById(R.id.dialogSaveButton);
 
-        EditText nameInput = new EditText(this);
-        nameInput.setHint("Place name");
-        nameInput.setSingleLine(true);
-        layout.addView(nameInput);
-
-        EditText locationInput = new EditText(this);
-        locationInput.setHint("Location (e.g. Mysuru, Karnataka)");
-        locationInput.setSingleLine(true);
-        layout.addView(locationInput);
-
-        Button dateButton = new Button(this);
-        dateButton.setText("Choose visit date");
-        layout.addView(dateButton);
-
-        EditText noteInput = new EditText(this);
-        noteInput.setHint("Write a little memory (optional)");
-        noteInput.setMinLines(2);
-        noteInput.setGravity(android.view.Gravity.TOP);
-        layout.addView(noteInput);
+        titleText.setText(existingPlace == null ? "Add a visited place" : "Edit visited place");
+        subtitleText.setText("Keep a record of the places you experienced.");
 
         final long[] selectedDate = {System.currentTimeMillis()};
-
-        java.text.SimpleDateFormat dateFormat =
-                new java.text.SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
-
-        dateButton.setText(dateFormat.format(new Date(selectedDate[0])));
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+        dateButton.setText("🗓 " + dateFormat.format(new Date(selectedDate[0])));
 
         dateButton.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
@@ -581,15 +595,15 @@ public class MainActivity extends AppCompatActivity {
                     this,
                     (view, year, month, day) -> {
                         Calendar chosen = Calendar.getInstance();
-                        chosen.set(year, month, day);
+                        chosen.set(year, month, day, 0, 0, 0);
+                        chosen.set(Calendar.MILLISECOND, 0);
                         selectedDate[0] = chosen.getTimeInMillis();
-                        dateButton.setText(dateFormat.format(chosen.getTime()));
+                        dateButton.setText("🗓 " + dateFormat.format(chosen.getTime()));
                     },
                     calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH),
                     calendar.get(Calendar.DAY_OF_MONTH)
             );
-
             picker.show();
         });
 
@@ -598,41 +612,70 @@ public class MainActivity extends AppCompatActivity {
             locationInput.setText(existingPlace.getLocation());
             noteInput.setText(existingPlace.getNote());
             selectedDate[0] = existingPlace.getVisitDate();
-            dateButton.setText(dateFormat.format(new Date(selectedDate[0])));
+            dateButton.setText("🗓 " + dateFormat.format(new Date(selectedDate[0])));
         }
 
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle(existingPlace == null ? "Add a visited place" : "Edit visited place")
-                .setView(layout)
-                .setNegativeButton("Cancel", null)
-                .setPositiveButton(existingPlace == null ? "Save place" : "Update", (dialog, which) -> {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
 
-                    String name = nameInput.getText().toString().trim();
-                    String location = locationInput.getText().toString().trim();
-                    String note = noteInput.getText().toString().trim();
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
 
-                    if (name.isEmpty()) {
-                        Toast.makeText(this, "Please enter a place name", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
+        saveButton.setOnClickListener(v -> {
+            String name = nameInput.getText().toString().trim();
+            String location = locationInput.getText().toString().trim();
+            String note = noteInput.getText().toString().trim();
 
-                    if (existingPlace == null) {
-                        VisitedPlace place = new VisitedPlace(
-                                tripId, name, location, selectedDate[0], note
-                        );
+            if (name.isEmpty()) {
+                Toast.makeText(this, "Please enter a place name", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                        visitedPlaceRepository.insertPlace(place, placeId -> refreshVisitedPlaces());
+            Calendar chosenCal = Calendar.getInstance();
+            chosenCal.setTimeInMillis(selectedDate[0]);
+            chosenCal.set(Calendar.HOUR_OF_DAY, 0);
+            chosenCal.set(Calendar.MINUTE, 0);
+            chosenCal.set(Calendar.SECOND, 0);
+            chosenCal.set(Calendar.MILLISECOND, 0);
+            long chosenMillis = chosenCal.getTimeInMillis();
 
-                    } else {
-                        existingPlace.setName(name);
-                        existingPlace.setLocation(location);
-                        existingPlace.setVisitDate(selectedDate[0]);
-                        existingPlace.setNote(note);
+            Runnable saveAction = () -> {
+                if (existingPlace == null) {
+                    VisitedPlace place = new VisitedPlace(
+                            tripId, name, location, selectedDate[0], note
+                    );
+                    visitedPlaceRepository.insertPlace(place, placeId -> refreshVisitedPlaces());
+                } else {
+                    existingPlace.setName(name);
+                    existingPlace.setLocation(location);
+                    existingPlace.setVisitDate(selectedDate[0]);
+                    existingPlace.setNote(note);
+                    visitedPlaceRepository.updatePlace(existingPlace, this::refreshVisitedPlaces);
+                }
+                dialog.dismiss();
+            };
 
-                        visitedPlaceRepository.updatePlace(existingPlace, this::refreshVisitedPlaces);
-                    }
-                })
-                .show();
+            if (currentTrip != null && (chosenMillis < currentTrip.getStartDate() || chosenMillis > currentTrip.getEndDate())) {
+                SimpleDateFormat dateFormatPrompt = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+                String tripDatesStr = dateFormatPrompt.format(new Date(currentTrip.getStartDate())) + " – " + dateFormatPrompt.format(new Date(currentTrip.getEndDate()));
+                String chosenDateStr = dateFormatPrompt.format(new Date(chosenMillis));
+
+                new AlertDialog.Builder(this)
+                        .setTitle("Date outside trip duration")
+                        .setMessage("The selected visit date (" + chosenDateStr + ") falls outside your trip duration (" + tripDatesStr + ").\n\nWhat would you like to do?")
+                        .setPositiveButton("Keep date anyway", (w, whichBtn) -> saveAction.run())
+                        .setNeutralButton("Change trip dates", (w, whichBtn) -> {
+                            dialog.dismiss();
+                            showEditTripDialog(() -> showAddPlaceDialog(existingPlace));
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            } else {
+                saveAction.run();
+            }
+        });
+
+        dialog.show();
     }
     private void refreshVisitedPlaces() {
 
@@ -719,6 +762,356 @@ public class MainActivity extends AppCompatActivity {
                                         visitedPlaceRepository.deletePlace(
                                                 place,
                                                 this::refreshVisitedPlaces
+                                        )
+                                )
+                                .show()
+                );
+
+                placeListContainer.addView(placeCard);
+            }
+        });
+    }
+
+    private void showAddPlannedPlaceDialog(PlannedPlace existingPlace) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_add_place, null);
+
+        TextView titleText = dialogView.findViewById(R.id.dialogTitleText);
+        TextView subtitleText = dialogView.findViewById(R.id.dialogSubtitleText);
+        EditText nameInput = dialogView.findViewById(R.id.dialogNameInput);
+        EditText locationInput = dialogView.findViewById(R.id.dialogLocationInput);
+        Button dateButton = dialogView.findViewById(R.id.dialogDateButton);
+        EditText noteInput = dialogView.findViewById(R.id.dialogNoteInput);
+        Button cancelButton = dialogView.findViewById(R.id.dialogCancelButton);
+        Button saveButton = dialogView.findViewById(R.id.dialogSaveButton);
+
+        titleText.setText(existingPlace == null ? "Add a place to visit" : "Edit place to visit");
+        subtitleText.setText("Plan your upcoming stops and itinerary.");
+
+        Calendar todayCal = Calendar.getInstance();
+        todayCal.set(Calendar.HOUR_OF_DAY, 0);
+        todayCal.set(Calendar.MINUTE, 0);
+        todayCal.set(Calendar.SECOND, 0);
+        todayCal.set(Calendar.MILLISECOND, 0);
+        long todayMillis = todayCal.getTimeInMillis();
+
+        final long[] selectedDate = {todayMillis};
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+        dateButton.setText("🗓 " + dateFormat.format(new Date(selectedDate[0])));
+
+        dateButton.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(selectedDate[0]);
+
+            DatePickerDialog picker = new DatePickerDialog(
+                    this,
+                    (view, year, month, day) -> {
+                        Calendar chosen = Calendar.getInstance();
+                        chosen.set(year, month, day, 0, 0, 0);
+                        chosen.set(Calendar.MILLISECOND, 0);
+                        selectedDate[0] = chosen.getTimeInMillis();
+                        dateButton.setText("🗓 " + dateFormat.format(chosen.getTime()));
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            );
+            picker.getDatePicker().setMinDate(todayMillis);
+            picker.show();
+        });
+
+        if (existingPlace != null) {
+            nameInput.setText(existingPlace.getName());
+            locationInput.setText(existingPlace.getLocation());
+            noteInput.setText(existingPlace.getNote());
+            selectedDate[0] = existingPlace.getPlannedDate();
+            dateButton.setText("🗓 " + dateFormat.format(new Date(selectedDate[0])));
+        }
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
+
+        saveButton.setOnClickListener(v -> {
+            String name = nameInput.getText().toString().trim();
+            String location = locationInput.getText().toString().trim();
+            String note = noteInput.getText().toString().trim();
+
+            if (name.isEmpty()) {
+                Toast.makeText(this, "Please enter a place name", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Calendar chosenCal = Calendar.getInstance();
+            chosenCal.setTimeInMillis(selectedDate[0]);
+            chosenCal.set(Calendar.HOUR_OF_DAY, 0);
+            chosenCal.set(Calendar.MINUTE, 0);
+            chosenCal.set(Calendar.SECOND, 0);
+            chosenCal.set(Calendar.MILLISECOND, 0);
+            long chosenMillis = chosenCal.getTimeInMillis();
+
+            if (chosenMillis < todayMillis) {
+                Toast.makeText(this, "Planned visit date cannot be in the past", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Runnable saveAction = () -> {
+                if (existingPlace == null) {
+                    PlannedPlace place = new PlannedPlace(
+                            tripId, name, location, selectedDate[0], note
+                    );
+
+                    plannedPlaceRepository.insertPlace(place, placeId -> refreshPlannedPlaces());
+
+                } else {
+                    existingPlace.setName(name);
+                    existingPlace.setLocation(location);
+                    existingPlace.setPlannedDate(selectedDate[0]);
+                    existingPlace.setNote(note);
+
+                    plannedPlaceRepository.updatePlace(existingPlace, this::refreshPlannedPlaces);
+                }
+
+                dialog.dismiss();
+            };
+
+            if (currentTrip != null && (chosenMillis < currentTrip.getStartDate() || chosenMillis > currentTrip.getEndDate())) {
+                SimpleDateFormat dateFormatPrompt = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+                String tripDatesStr = dateFormatPrompt.format(new Date(currentTrip.getStartDate())) + " – " + dateFormatPrompt.format(new Date(currentTrip.getEndDate()));
+                String chosenDateStr = dateFormatPrompt.format(new Date(chosenMillis));
+
+                new AlertDialog.Builder(this)
+                        .setTitle("Date outside trip duration")
+                        .setMessage("The selected date (" + chosenDateStr + ") falls outside your trip duration (" + tripDatesStr + ").\n\nWhat would you like to do?")
+                        .setPositiveButton("Keep date anyway", (w, whichBtn) -> saveAction.run())
+                        .setNeutralButton("Change trip dates", (w, whichBtn) -> {
+                            dialog.dismiss();
+                            showEditTripDialog(() -> showAddPlannedPlaceDialog(existingPlace));
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            } else {
+                saveAction.run();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void updateTripHeader() {
+        TextView tripTitleText = findViewById(R.id.tripTitleText);
+        TextView tripDatesHeaderText = findViewById(R.id.tripDatesHeaderText);
+
+        if (currentTrip != null) {
+            this.tripTitle = currentTrip.getName();
+            if (tripTitleText != null) {
+                tripTitleText.setText(currentTrip.getName());
+            }
+
+            if (tripDatesHeaderText != null) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+                tripDatesHeaderText.setText("🗓 " + dateFormat.format(new Date(currentTrip.getStartDate())) + " – " + dateFormat.format(new Date(currentTrip.getEndDate())));
+            }
+        }
+    }
+
+    private void showEditTripDialog() {
+        showEditTripDialog(null);
+    }
+
+    private void showEditTripDialog(Runnable onUpdated) {
+        if (currentTrip == null) return;
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_create_trip, null);
+
+        TextView titleText = dialogView.findViewById(R.id.dialogTitleText);
+        TextView subtitleText = dialogView.findViewById(R.id.dialogSubtitleText);
+        EditText nameInput = dialogView.findViewById(R.id.dialogTripNameInput);
+        Button startDateButton = dialogView.findViewById(R.id.dialogStartDateButton);
+        Button endDateButton = dialogView.findViewById(R.id.dialogEndDateButton);
+        Button cancelButton = dialogView.findViewById(R.id.dialogCancelButton);
+        Button saveButton = dialogView.findViewById(R.id.dialogCreateButton);
+
+        if (titleText != null) titleText.setText("Edit Trip Dates");
+        if (subtitleText != null) subtitleText.setText("Update your journey name and travel dates.");
+        if (saveButton != null) saveButton.setText("Save");
+
+        nameInput.setText(currentTrip.getName());
+
+        final long[] startDateMillis = {currentTrip.getStartDate()};
+        final long[] endDateMillis = {currentTrip.getEndDate()};
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+        startDateButton.setText("Start: " + dateFormat.format(new Date(startDateMillis[0])));
+        endDateButton.setText("End: " + dateFormat.format(new Date(endDateMillis[0])));
+
+        startDateButton.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(startDateMillis[0]);
+            DatePickerDialog picker = new DatePickerDialog(
+                    this,
+                    (view, year, month, day) -> {
+                        Calendar chosen = Calendar.getInstance();
+                        chosen.set(year, month, day, 0, 0, 0);
+                        chosen.set(Calendar.MILLISECOND, 0);
+                        startDateMillis[0] = chosen.getTimeInMillis();
+                        startDateButton.setText("Start: " + dateFormat.format(chosen.getTime()));
+                        if (endDateMillis[0] < startDateMillis[0]) {
+                            endDateMillis[0] = startDateMillis[0];
+                            endDateButton.setText("End: " + dateFormat.format(chosen.getTime()));
+                        }
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            );
+            picker.show();
+        });
+
+        endDateButton.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(endDateMillis[0]);
+            DatePickerDialog picker = new DatePickerDialog(
+                    this,
+                    (view, year, month, day) -> {
+                        Calendar chosen = Calendar.getInstance();
+                        chosen.set(year, month, day, 0, 0, 0);
+                        chosen.set(Calendar.MILLISECOND, 0);
+                        endDateMillis[0] = chosen.getTimeInMillis();
+                        endDateButton.setText("End: " + dateFormat.format(chosen.getTime()));
+                    },
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+            );
+            picker.getDatePicker().setMinDate(startDateMillis[0]);
+            picker.show();
+        });
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        cancelButton.setOnClickListener(v -> dialog.dismiss());
+
+        saveButton.setOnClickListener(v -> {
+            String name = nameInput.getText().toString().trim();
+            if (name.isEmpty()) {
+                Toast.makeText(this, "Trip name cannot be empty", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (endDateMillis[0] < startDateMillis[0]) {
+                Toast.makeText(this, "End date cannot be before start date", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            currentTrip.setName(name);
+            currentTrip.setStartDate(startDateMillis[0]);
+            currentTrip.setEndDate(endDateMillis[0]);
+
+            tripRepository.updateTrip(currentTrip, () -> {
+                Toast.makeText(this, "Trip dates updated!", Toast.LENGTH_SHORT).show();
+                updateTripHeader();
+                dialog.dismiss();
+                if (onUpdated != null) {
+                    onUpdated.run();
+                }
+            });
+        });
+
+        dialog.show();
+    }
+
+    private void refreshPlannedPlaces() {
+
+        LinearLayout placeListContainer =
+                findViewById(R.id.plannedPlaceListContainer);
+
+        View emptyCard = findViewById(R.id.plannedPlaceEmptyCard);
+
+        if (placeListContainer == null || emptyCard == null) return;
+
+        plannedPlaceRepository.getPlannedPlacesByTripId(tripId, places -> {
+
+            placeListContainer.removeAllViews();
+
+            if (places.isEmpty()) {
+                emptyCard.setVisibility(View.VISIBLE);
+                return;
+            }
+
+            emptyCard.setVisibility(View.GONE);
+
+            LayoutInflater inflater = LayoutInflater.from(this);
+
+            for (PlannedPlace place : places) {
+
+                View placeCard = inflater.inflate(
+                        R.layout.item_planned_place,
+                        placeListContainer,
+                        false
+                );
+
+                TextView nameText =
+                        placeCard.findViewById(R.id.plannedPlaceNameText);
+
+                TextView locationText =
+                        placeCard.findViewById(R.id.plannedPlaceLocationText);
+
+                TextView dateText =
+                        placeCard.findViewById(R.id.plannedPlaceDateText);
+
+                TextView noteText =
+                        placeCard.findViewById(R.id.plannedPlaceNoteText);
+
+                Button editButton =
+                        placeCard.findViewById(R.id.editPlannedPlaceButton);
+
+                Button deleteButton =
+                        placeCard.findViewById(R.id.deletePlannedPlaceButton);
+
+                nameText.setText(place.getName());
+
+                if (place.getLocation() == null ||
+                        place.getLocation().trim().isEmpty()) {
+                    locationText.setVisibility(View.GONE);
+                } else {
+                    locationText.setVisibility(View.VISIBLE);
+                    locationText.setText("📍 " + place.getLocation());
+                }
+
+                SimpleDateFormat dateFormat =
+                        new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+
+                dateText.setText(
+                        "🗓 Planned for " +
+                                dateFormat.format(new Date(place.getPlannedDate()))
+                );
+
+                if (place.getNote() == null ||
+                        place.getNote().trim().isEmpty()) {
+                    noteText.setVisibility(View.GONE);
+                } else {
+                    noteText.setVisibility(View.VISIBLE);
+                    noteText.setText(place.getNote());
+                }
+
+                editButton.setOnClickListener(v ->
+                        showAddPlannedPlaceDialog(place)
+                );
+
+                deleteButton.setOnClickListener(v ->
+                        new AlertDialog.Builder(this)
+                                .setTitle("Delete place to visit?")
+                                .setMessage("Remove " + place.getName() + " from your planned destinations?")
+                                .setNegativeButton("Cancel", null)
+                                .setPositiveButton("Delete", (dialog, which) ->
+                                        plannedPlaceRepository.deletePlace(
+                                                place,
+                                                this::refreshPlannedPlaces
                                         )
                                 )
                                 .show()

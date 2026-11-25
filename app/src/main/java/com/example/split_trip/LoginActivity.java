@@ -35,6 +35,16 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        SharedPreferences preferences =
+                getSharedPreferences("splittrip_session", MODE_PRIVATE);
+
+        if (preferences.getBoolean("isLoggedIn", false)) {
+            Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
+
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
 
         setContentView(R.layout.activity_login);
@@ -106,13 +116,10 @@ public class LoginActivity extends AppCompatActivity {
 
         loginButton.setOnClickListener(v -> validateLogin());
 
-        signupText.setOnClickListener(v ->
-                Toast.makeText(
-                        this,
-                        "Registration will be available when the backend is connected.",
-                        Toast.LENGTH_SHORT
-                ).show()
-        );
+        signupText.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void validateLogin() {
